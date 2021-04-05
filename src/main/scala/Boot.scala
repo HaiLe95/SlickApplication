@@ -53,13 +53,37 @@ object Boot {
     val setupFuture = database.run(setup)
     logger.info("Supps down below")
 
-    database.run(suppliers.result).map(_.foreach{
+    database.run(suppliers.result).map(_.foreach {
       case (id, name, street, city, state, zip) =>
         println(s"SUPPLIES: $id, $name, $street, $city, $state, $zip")
       case _ =>
         logger.error("Nothing is in here!")
     })
+
+    logger.info("suppliers query is done, successfully or not")
+
+
+    // Why not let the database do the string conversion and concatenation?
+    val q1 = for(c <- coffees)
+      yield {
+        LiteralColumn("  ") ++ c.name ++ "\t" ++ c.supId.asColumnOf[String] ++
+        "\t" ++ c.price.asColumnOf[String] ++ "\t" ++ c.sales.asColumnOf[String] ++
+        "\t" ++ c.total.asColumnOf[String]
+      }
+
+    // The first string constant needs to be lifted manually to a LiteralColumn
+    // so that the proper ++ operator is found
+
+    // Equivalent SQL code:
+    // select '  ' || COF_NAME || '\t' || SUP_ID || '\t' || PRICE || '\t' SALES || '\t' TOTAL from COFFEES
+
+    logger.info("STREAMING STARTS")
+
+    database.stream(q1.result).foreach(println)
+
     logger.info("Done")
+
+    database.close()
 
   }
 
