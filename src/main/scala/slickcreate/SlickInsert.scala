@@ -101,5 +101,11 @@ object SlickInsert {
 
     execute(messages ++= testMessages)
 
+    /** More control over Inserts */
+
+    val data = Query(("Stanley", "Cut!"))
+    val exist =
+      messages.filter(m => m.sender === "Stanley" && m.content === "Cut").exists
+
   }
 }
