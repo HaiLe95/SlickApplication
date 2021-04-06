@@ -67,7 +67,7 @@ object SlickActions {
 
     final class PersonTable(tag: Tag) extends Table[Option[String]](tag, "PERSON") {
       def nickname = column[Option[String]]("nickname")
-      def * = (nickname)
+      def * = nickname
     }
 
     // You can put an Option as an expression argument, but not None or Some
@@ -107,6 +107,35 @@ object SlickActions {
     //  order by "sender"
     //  limit 5 offset 5
 
+    /** Conditional Filtering
+     *  filterOpt (Option)
+     *  filterIf
+     */
+    // Filtering by a member, but if we don't specify a name we want to get all of them
+    def query1(name: Option[String]) = {
+      messages.filter(msg => msg.sender === name)
+    }
+    // The problem with this query is that we wont get any value if we put None as name argument instead of all
+
+    def query2(name: Option[String]) = {
+      messages.filterOpt(name)((row, value) => row.sender === value)
+    }
+    // filter Option (OptionValue) (function: (row, value) => row.(message?).sender === value)
+
+    query2(None).result.statements.mkString
+    // Select sender, content and id form messages
+    query2(Some("Dave")).result.statements.mkString
+    // Select sender, content and id from messages where sender is Dave
+
+    val hideOldMessages = true
+    val queryIf = messages.filterIf(hideOldMessages)(_.id > 100L)
+    // Select sender, content adn id from messages where id > 100
+
+    val person = Some("Dave")
+    val queryToRun = {
+      messages.filterOpt(person)(_.sender === _).filterIf(hideOldMessages)(_.id > 100L)
+    }
+    // Select everything from messages where sender is Dave and id > 100
 
   }
 

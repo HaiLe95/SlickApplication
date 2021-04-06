@@ -56,8 +56,6 @@ object Boot {
     database.run(suppliers.result).map(_.foreach {
       case (id, name, street, city, state, zip) =>
         println(s"SUPPLIES: $id, $name, $street, $city, $state, $zip")
-      case _ =>
-        logger.error("Nothing is in here!")
     })
 
     logger.info("suppliers query is done, successfully or not")
