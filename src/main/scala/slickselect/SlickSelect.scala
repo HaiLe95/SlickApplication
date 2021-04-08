@@ -54,7 +54,11 @@ object SlickSelect {
     messages.map(_.content).result.statements.mkString
     // result String = "select \"content\" from \"message\""
 
-    val containsPods = messages.map(_.content).filter{content: Rep[String] => content like "%pod%"}
+    val containsPods = messages
+      .map(_.content)
+      .filter {
+        content: Rep[String] => content like "%pod%"
+      }
     // What's mean select everything from messages content that has "pod" in it
     // containsPods: Query[Rep[String], String, Seq] = Rep(Filter @172230316)
 

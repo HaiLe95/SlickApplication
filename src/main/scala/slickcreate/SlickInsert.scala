@@ -21,7 +21,7 @@ object SlickInsert {
 
     /** Inserting a rows
      *  A single one
-     *
+     *  Force Insert
      */
 
     val insertAction =
@@ -71,7 +71,7 @@ object SlickInsert {
     // res9: messagesReturningId.SingleInsertResult = 1002L
 
     /** Retrieving a Rows on Insert; BUT H2 DON'T ALLOW US TO DO THIS */
-    //NOT WORKING IN H2
+    //NOT WORKING IN H2:
     execute(messages returning messages +=
       Messages.Message("Dave", "So... what do we do now?"))
 
@@ -90,7 +90,7 @@ object SlickInsert {
     // insert into message sender values(?)
     messages.map(_.sender)
     execute(messages.map(_.sender) += "HAL")
-    //ERROR cause tables can't be Nullable
+    //ERROR cause tables can't be Nullable, but theoreticaly it's ok
 
     val testMessages = Seq(
       Messages.Message("Dave", "Hello, HAL. Do you read me, HAL?"),
@@ -105,7 +105,11 @@ object SlickInsert {
 
     val data = Query(("Stanley", "Cut!"))
     val exist =
-      messages.filter(m => m.sender === "Stanley" && m.content === "Cut").exists
+      messages
+        .filter(m => m.sender === "Stanley" && m.content === "Cut")
+        .exists
+
+    val selectExpression = data.filterNot(_ => exist)
 
   }
 }
